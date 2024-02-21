@@ -1769,8 +1769,15 @@ impl Render for Pane {
             }))
             .on_action(
                 cx.listener(|pane: &mut Self, action: &CloseActiveItem, cx| {
-                    pane.close_active_item(action, cx)
-                        .map(|task| task.detach_and_log_err(cx));
+                    println!("Closing active pane");
+                    match pane.close_active_item(action, cx)
+                        .map(|task| task.detach_and_log_err(cx)) {
+                            Some(x) => x,
+                            None => {
+                                println!("No active pane to close");
+                                pane.workspace.close_window(workspace::CloseWindow, cx);
+                            }
+                        }
                 }),
             )
             .on_action(
